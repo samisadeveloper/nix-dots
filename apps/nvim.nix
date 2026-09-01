@@ -13,6 +13,11 @@
         programs.nvf = {
                 enable = true;
                 settings = {
+                        vim.opts.cursorline = true;
+
+                        # fix any filetypes that aren't exact
+                        vim.filetype.extension = { xaml = "xml"; };
+
                         vim.terminal.toggleterm.enable = true;
                         vim.terminal.toggleterm.lazygit.enable = true;
                         vim.binds.whichKey.enable = true;
@@ -24,6 +29,20 @@
                         vim.languages.typescript.enable = true;
                         vim.languages.java.enable = true;
                         vim.languages.docker.enable = true;
+
+                        # C# installation
+                        vim.languages.csharp.enable = true;
+                        vim.languages.csharp.lsp.servers = ["csharp_ls"];
+                        
+                        # XML support
+                        vim.languages.xml = {
+                                enable = true;
+                                lsp = {
+                                        enable = true;
+                                        servers = [ "lemminx" ];
+                                };
+                        };
+
                         vim.languages.nix = {
                                 enable = true;
                                 lsp.servers = [ "nixd" ];
