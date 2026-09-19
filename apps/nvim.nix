@@ -14,6 +14,7 @@
                 enable = true;
                 settings = {
                         vim.opts.cursorline = true;
+                        vim.opts.tabstop = 4;
 
                         # fix any filetypes that aren't exact
                         vim.filetype.extension = { xaml = "xml"; };
@@ -25,9 +26,11 @@
                         # lsp
                         vim.lsp.enable = true;
 
+                        vim.languages.qml.enable = true;
                         vim.languages.tsx.enable = true;
                         vim.languages.typescript.enable = true;
                         vim.languages.java.enable = true;
+                        vim.languages.python.enable = true;
                         vim.languages.docker.enable = true;
 
                         # C# installation
