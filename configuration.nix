@@ -47,28 +47,46 @@
           options = [ "rw" "uid=1000" "gid=100" "umask=0022" "nofail" ];
   };
 
-  # mount dell-depression-box
+  # mount nextcloud
+  systemd.services.rclone-nextcloud = {
+          description = "Rclone mount for Nextcloud";
+          after = [ "network-online.target" ];
+          wants = [ "network-online.target" ];
+          wantedBy = [ "multi-user.target" ];
+          path = [ "/run/wrappers" ];
+          serviceConfig = {
+                  Type = "notify";
+                  ExecStartPre = "${pkgs.coreutils}/bin/mkdir -p /mnt/nextcloud";
+                  ExecStart = "${pkgs.rclone}/bin/rclone mount nextcloud: /mnt/nextcloud --vfs-cache-mode writes --dir-cache-time 30s --config=/home/sam/.config/rclone/rclone.conf --uid=1000 --gid=100";
+                  ExecStop = "${pkgs.fuse}/bin/fusermount -u /mnt/nextcloud";
+                  Restart = "on-failure";
+                  RestartSec = 5;
+                  User = "sam";
+          };
+  };
+
+# mount dell-depression-box
   fileSystems."/mnt/dell-server" = {
-    device = "sam@192.168.0.201:/";
-    fsType = "fuse.sshfs";
-    options = [
-      # Standard systemd automount behaviors
-      "x-systemd.automount"
-      "noauto"
-      "allow_other"
-      "reconnect"
-      "ServerAliveInterval=15"
-      "ServerAliveCountMax=3"
-      
-      # Points cleanly to the root-owned copy of your working key
-      "IdentityFile=/root/.ssh/id_ed25519"
-      
-      # CRITICAL: Bypasses the hidden interactive "trust host" prompt that kills automounts
-      "StrictHostKeyChecking=no"
-      
-      # Tell the systemd mount environment where to find the SSH binary inside NixOS
-      "ssh_command=${pkgs.openssh}/bin/ssh"
-    ];
+          device = "sam@192.168.0.201:/";
+          fsType = "fuse.sshfs";
+          options = [
+# Standard systemd automount behaviors
+                  "x-systemd.automount"
+                          "noauto"
+                          "allow_other"
+                          "reconnect"
+                          "ServerAliveInterval=15"
+                          "ServerAliveCountMax=3"
+
+# Points cleanly to the root-owned copy of your working key
+                          "IdentityFile=/root/.ssh/id_ed25519"
+
+# CRITICAL: Bypasses the hidden interactive "trust host" prompt that kills automounts
+                          "StrictHostKeyChecking=no"
+
+# Tell the systemd mount environment where to find the SSH binary inside NixOS
+                          "ssh_command=${pkgs.openssh}/bin/ssh"
+          ];
   };
 
   networking.hostName = "nixos"; # Define your hostname.
@@ -184,38 +202,70 @@
   nix.settings.experimental-features = [ "nix-command" "flakes"];
 
   # steam moment
-  programs.steam.enable = true;
+  programs.steam = {
+        enable = true;
+        extest.enable = true;
+  };
+
+  # coding or something
+  programs.nix-ld.enable = true;
+  programs.nix-ld.libraries = with pkgs; [
+          mesa
+          libxkbcommon
+          glib
+          nss
+          nspr
+          atk
+          cups
+          dbus
+          libdrm
+          gtk3
+          pango
+          cairo
+          xorg.libX11
+          xorg.libXcomposite
+          xorg.libXdamage
+          xorg.libXext
+          xorg.libXfixes
+          xorg.libXrandr
+          mesa
+          alsa-lib
+          expat
+  ];
+
   hardware.graphics.enable = true;
   hardware.graphics.enable32Bit = true;
 
-  # List packages installed in system profile. To search, run:
-  # $ nix search wget
+  programs.gpu-screen-recorder.enable = true;
+
   environment.systemPackages = with pkgs; [
+        # --- mounting ---
+        rclone
 
         # --- tools ---
         home-manager # nix home manager
-        kitty # terminal
         git # version control
         zoxide # good
         starship # bash
-
-        # --- hyprland ---
-        wofi # drun
-        wayle # bar
+        xwayland-satellite
+        yt-dlp
 
         # --- media ---
-	vesktop # discord
+        vesktop # discord
         brave # browser
         obsidian # notes
         gimp # photo editing
         obs-studio # recording
+        gpu-screen-recorder-ui # recording
         vlc # media player
   
         # --- gaming ---
         prismlauncher # minecraft launcher
         pcsx2 # PS2 Emulator
+        rpcs3 # PS3 Emulator
         cemu # wii u emulator
         ryubing # switch emulator
+        r2modman # mod manager
   ];
 
   # Some programs need SUID wrappers, can be configured further or are
