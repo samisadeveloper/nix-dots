@@ -48,6 +48,7 @@ in {
                 inotify-tools
                 sync-script
                 quickshell
+                playerctl
         ];
 
         xdg.configFile."quickshell/overview" = {
@@ -56,17 +57,24 @@ in {
 
         programs.caelestia = {
                 enable = true;
+
                 systemd = {
                         enable = false; # if you prefer starting from your compositor
                         target = "graphical-session.target";
                         environment = [];
                 };
                 settings = {
+                        general.idle = {
+                                lockBeforeSleep = false;
+                                inhibitWhenAudio = false;
+                                timeouts = [];
+                        };
+
                         bar.statusIcons = [
-                        { id = "lockStatus"; enabled = false; }
-                        { id = "network"; enabled = true; }
-                        { id = "bluetooth"; enabled = true; }
-                        { id = "battery"; enabled = false; }
+                                { id = "lockStatus"; enabled = false; }
+                                { id = "network"; enabled = true; }
+                                { id = "bluetooth"; enabled = true; }
+                                { id = "battery"; enabled = false; }
                         ];
 
                         paths.wallpaperDir = "~/Videos/Wallpapers/";
@@ -188,6 +196,57 @@ in {
                                 (lib.generators.mkLuaInline "hl.dsp.global(\"caelestia:screenshot\")")
                         ];
                 }
+
+                # --- MULTI MEDIA ---
+
+                # volume up
+                {
+                        _args = [
+                                "XF86AudioRaiseVolume"
+                                (lib.generators.mkLuaInline "hl.dsp.exec_cmd(\"wpctl set-volume @DEFAULT_AUDIO_SINK@ 1%+\")")
+                        ];
+                }
+
+                # volume down
+                {
+                        _args = [
+                                "XF86AudioLowerVolume"
+                                (lib.generators.mkLuaInline "hl.dsp.exec_cmd(\"wpctl set-volume @DEFAULT_AUDIO_SINK@ 1%-\")")
+                        ];
+                }
+
+                # volume mute/unmute
+                {
+                        _args = [
+                                "XF86AudioMute"
+                                (lib.generators.mkLuaInline "hl.dsp.exec_cmd(\"wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle\")")
+                        ];
+                }
+
+                # play/pause
+                {
+                        _args = [
+                                "XF86AudioPlay"
+                                (lib.generators.mkLuaInline "hl.dsp.exec_cmd(\"playerctl play-pause\")")
+                        ];
+                }
+
+                # audio next
+                {
+                        _args = [
+                                "XF86AudioNext"
+                                (lib.generators.mkLuaInline "hl.dsp.exec_cmd(\"playerctl next\")")
+                        ];
+                }
+
+                # audio previous
+                {
+                        _args = [
+                                "XF86AudioPrev"
+                                (lib.generators.mkLuaInline "hl.dsp.exec_cmd(\"playerctl previous\")")
+                        ];
+                }
+
 
                 # --- KEYBOARD MOVEMENTS (vim style) ---
 
