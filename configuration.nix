@@ -111,6 +111,14 @@
     };
   };
 
+  users.users.ollama = {
+        isSystemUser = true;
+          group = "ollama";
+          extraGroups = [ "video" "render" ];
+  };
+
+  users.groups.ollama = {};
+
   # Enable flatpak for sober
   services.flatpak.enable = true;
 
