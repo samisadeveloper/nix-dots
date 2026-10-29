@@ -13,6 +13,27 @@
         programs.nvf = {
                 enable = true;
                 settings = {
+                        # extra plugins
+                        vim.extraPlugins.luau-lsp = {
+                                package = pkgs.vimPlugins.luau-lsp-nvim;
+                                setup = ''
+                                        local types = vim.env.ROBLOX_TYPES
+                                        require("luau-lsp").setup({
+                                                platform = { type = "roblox" },
+
+                                                types = {
+                                                        definition_files = types and { types } or {},
+                                                },
+
+                                                sourcemap = {
+                                                        enabled = true,
+                                                        autogenerate = true,
+                                                        rojo_project_file = "default.project.json",
+                                                },
+                                        })
+                                '';
+                        };
+
                         vim.opts.cursorline = true;
                         vim.opts.tabstop = 4;
 
@@ -26,6 +47,7 @@
                         # lsp
                         vim.lsp.enable = true;
 
+                        vim.languages.rust.enable = true;
                         vim.languages.qml.enable = true;
                         vim.languages.tsx.enable = true;
                         vim.languages.typescript.enable = true;
