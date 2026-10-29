@@ -218,6 +218,10 @@
   # coding or something
   programs.nix-ld.enable = true;
   programs.nix-ld.libraries = with pkgs; [
+          xorg.libxcb
+          libxcb-cursor
+          libGL
+
           mesa
           libxkbcommon
           glib
@@ -263,6 +267,7 @@
         brave # browser
         obsidian # notes
         gimp # photo editing
+        inkscape # creating icons and stuff
         obs-studio # recording
         gpu-screen-recorder-ui # recording
         vlc # media player
